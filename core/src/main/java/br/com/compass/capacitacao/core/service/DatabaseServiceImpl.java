@@ -20,7 +20,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     public Connection getConnection() {
         Connection connection = null;
         try {
-            DataSource dataSource = (DataSource) dataSourcePool.getDataSource("aem_datasource");
+            DataSource dataSource = (DataSource) dataSourcePool.getDataSource("capacitacao");
             connection = dataSource.getConnection();
             logger.debug("Connection obtained");
         }

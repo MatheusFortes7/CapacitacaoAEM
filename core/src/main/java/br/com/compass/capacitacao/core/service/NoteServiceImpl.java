@@ -5,12 +5,14 @@ import br.com.compass.capacitacao.core.models.Note;
 import com.google.gson.Gson;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
+import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.List;
 
+@Component(immediate = true, service = NoteService.class)
 public class NoteServiceImpl implements NoteService{
 
     @Reference
@@ -23,15 +25,24 @@ public class NoteServiceImpl implements NoteService{
     public void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
         String id = request.getParameter("id");
-        if(id != null || !id.isEmpty()){
+        if(id != null){
             try{
-                response.getWriter().write(strToJson(getNoteByClientId(Integer.parseInt(id))));
+                List<Note> note = getNoteByClientId(Integer.parseInt(id));
+                if(note.size() > 0){
+                    response.getWriter().write(strToJson(note));
+                }else{
+                    response.getWriter().write(strToJson("No notes found for this id"));
+                }
             } catch (Exception e){
                 throw new RuntimeException("Id must be a number");
             }
         }else{
             try{
-                response.getWriter().write(strToJson(getAllNote()));
+                if(getAllNote().size() > 0){
+                    response.getWriter().write(strToJson(getAllNote()));
+                }else{
+                    response.getWriter().write(strToJson("No notes found"));
+                }
             } catch (Exception e){
                 throw new RuntimeException("Error");
             }

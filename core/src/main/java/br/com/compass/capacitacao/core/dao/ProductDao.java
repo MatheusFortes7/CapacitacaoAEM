@@ -10,7 +10,7 @@ public interface ProductDao {
     Product getProductById(int id);
     List<Product> getProductByWord(String word);
     List<Product> getProductByCategory(String category);
-    List<Product> getProductByPrice(float price);
+    List<Product> getProductByPrice();
 
     void addProduct(Product product);
 

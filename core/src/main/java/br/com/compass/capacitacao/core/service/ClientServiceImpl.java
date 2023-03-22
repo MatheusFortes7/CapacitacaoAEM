@@ -8,6 +8,7 @@ import com.google.gson.reflect.TypeToken;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
 import org.apache.tika.io.IOUtils;
+import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import javax.servlet.ServletException;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
 
+@Component(immediate = true, service = ClientService.class)
 public class ClientServiceImpl implements ClientService{
 
     @Reference
@@ -30,15 +32,24 @@ public class ClientServiceImpl implements ClientService{
     public void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
         String id = request.getParameter("id");
-        if(id != null || !id.isEmpty()){
+        if(id != null){
             try{
-                response.getWriter().write(strToJson(getClientById(Integer.parseInt(id))));
+                if(getClientById(Integer.parseInt(id)) == null){
+                    response.getWriter().write("No client found");
+                } else {
+                    response.getWriter().write(strToJson(getClientById(Integer.parseInt(id))));
+                }
             } catch (Exception e){
                 throw new RuntimeException("Id must be a number");
             }
         }else{
             try{
-                response.getWriter().write(strToJson(getAllClient()));
+                List<Client> clients = getAllClient();
+                if(clients.size() == 0){
+                    response.getWriter().write("No client found");
+                } else {
+                    response.getWriter().write(strToJson(clients));
+                }
             } catch (Exception e){
                 throw new RuntimeException("Error");
             }

@@ -3,25 +3,28 @@ package br.com.compass.capacitacao.core.dao;
 import br.com.compass.capacitacao.core.models.Product;
 import br.com.compass.capacitacao.core.service.DatabaseService;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 
 @Component(service = ProductDao.class, immediate = true)
 public class ProductDaoImpl implements ProductDao{
 
+    @Reference
     DatabaseService databaseService;
     @Override
     public List<Product> getAllProducts() {
         try(Connection connection = databaseService.getConnection()) {
             String sql = "SELECT * FROM produto";
-            List<Product> products = null;
+            List<Product> products = new LinkedList<>();
             try(PreparedStatement statement = connection.prepareStatement(sql)) {
                 try(ResultSet resultSet = statement.executeQuery()) {
-                    if(resultSet.next()) {
+                    while(resultSet.next()) {
                         Product product = new Product();
                         product.setId(resultSet.getInt("id"));
                         product.setName(resultSet.getString("name"));
@@ -57,7 +60,7 @@ public class ProductDaoImpl implements ProductDao{
                     }
                 }
             } catch (SQLException ex) {
-                throw new RuntimeException(ex.getMessage() + " Error getting the product by this id.");
+                throw new RuntimeException(ex.getMessage() + " Error getting the client by this id.");
             }
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
@@ -68,12 +71,13 @@ public class ProductDaoImpl implements ProductDao{
     @Override
     public List<Product> getProductByWord(String word) {
         try(Connection connection = databaseService.getConnection()) {
-            String sql = "SELECT * FROM produto WHERE name LIKE ?";
-            List<Product> products = null;
+            //TODO olhar como colocar as % aqui no sql, pq tem que colocar o nome certinho pra achar o produto
+            String sql = "SELECT * FROM produto WHERE name LIKE  ? ";
+            List<Product> products = new LinkedList<>();
             try(PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, word);
                 try(ResultSet resultSet = statement.executeQuery()) {
-                    if(resultSet.next()) {
+                    while(resultSet.next()) {
                         Product product = new Product();
                         product.setId(resultSet.getInt("id"));
                         product.setName(resultSet.getString("name"));
@@ -95,11 +99,11 @@ public class ProductDaoImpl implements ProductDao{
     public List<Product> getProductByCategory(String category) {
         try(Connection connection = databaseService.getConnection()) {
             String sql = "SELECT * FROM produto WHERE category = ?";
-            List<Product> products = null;
+            List<Product> products = new LinkedList<>();
             try(PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, category);
                 try(ResultSet resultSet = statement.executeQuery()) {
-                    if(resultSet.next()) {
+                    while(resultSet.next()) {
                         Product product = new Product();
                         product.setId(resultSet.getInt("id"));
                         product.setName(resultSet.getString("name"));
@@ -118,14 +122,13 @@ public class ProductDaoImpl implements ProductDao{
     }
 
     @Override
-    public List<Product> getProductByPrice(float price) {
+    public List<Product> getProductByPrice() {
         try(Connection connection = databaseService.getConnection()) {
             String sql = "SELECT * FROM produto ORDER BY price ASC";
-            List<Product> products = null;
+            List<Product> products = new LinkedList<>();
             try(PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setFloat(1, price);
                 try(ResultSet resultSet = statement.executeQuery()) {
-                    if(resultSet.next()) {
+                    while(resultSet.next()) {
                         Product product = new Product();
                         product.setId(resultSet.getInt("id"));
                         product.setName(resultSet.getString("name"));

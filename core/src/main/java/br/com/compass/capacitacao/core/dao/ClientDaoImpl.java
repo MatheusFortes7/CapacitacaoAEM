@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 
 @Component(service = ClientDao.class, immediate = true)
@@ -43,13 +44,11 @@ public class ClientDaoImpl implements ClientDao{
     public List<Client> getAllClients() {
         try(Connection connection = databaseService.getConnection()) {
             String sql = "SELECT * FROM cliente";
-            List<Client> clients = null;
+            List<Client> clients = new LinkedList<>();
             try(PreparedStatement statement = connection.prepareStatement(sql)) {
                 try(ResultSet resultSet = statement.executeQuery()) {
-                    if(resultSet.next()) {
-                        Client client = new Client();
-                        client.setId(resultSet.getInt("id"));
-                        client.setName(resultSet.getString("name"));
+                    while(resultSet.next()) {
+                        Client client = new Client(resultSet.getInt(1), resultSet.getString(2));
                         clients.add(client);
                     }
                 }

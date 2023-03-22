@@ -8,6 +8,7 @@ import com.google.gson.reflect.TypeToken;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
 import org.apache.tika.io.IOUtils;
+import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import javax.servlet.ServletException;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
 
+@Component(immediate = true, service = ProductService.class)
 public class ProductServiceImpl implements ProductService {
 
     @Reference
@@ -32,34 +34,67 @@ public class ProductServiceImpl implements ProductService {
         String idString = request.getParameter("id");
         String name = request.getParameter("name");
         String category = request.getParameter("category");
+        String price = request.getParameter("price");
         int id = 0;
-        if(idString != null || !idString.isEmpty()){
+        if(idString != null){
             try{
                 id = Integer.parseInt(idString);
             } catch (Exception e){
                 throw new RuntimeException("Id must be a number");
             }
-            response.getWriter().write(strToJson(getProductById(id)));
-        }else if(name != null || !name.isEmpty()){
+            Product products = getProductById(id);
+            if(products == null){
+                response.getWriter().write("No product found");
+            }else{
+                response.getWriter().write(strToJson(products));
+            }
+        }else if(name != null ){
             try{
-                response.getWriter().write(strToJson(getProductByName(name)));
+                List<Product> products = getProductByWord(name);
+                if(products.size() == 0){
+                    response.getWriter().write("No product found");
+                }else{
+                    response.getWriter().write(strToJson(products));
+                }
             } catch (Exception e){
                 throw new RuntimeException("Name must be a string");
             }
-        }else if(category != null || !category.isEmpty()){
+        }else if(category != null ){
             try{
-                response.getWriter().write(strToJson(getProductByCategory(category)));
+                List<Product> products = getProductByCategory(category);
+                if(products.size() == 0){
+                    response.getWriter().write("No product found");
+                }else{
+                    response.getWriter().write(strToJson(products));
+                }
             } catch (Exception e){
                 throw new RuntimeException("Category must be a string");
             }
-        }else{
+        }else if(price != null) {
             try{
-                response.getWriter().write(strToJson(getAllProduct()));
+                List<Product> products = getProductByPrice();
+                if(products.size() == 0){
+                    response.getWriter().write("No product found");
+                }else{
+                    response.getWriter().write(strToJson(products));
+                }
             } catch (Exception e){
                 throw new RuntimeException("Error");
             }
+        }else{
+                try{
+                    List<Product> products = getAllProduct();
+                    if(products.size() == 0){
+                        response.getWriter().write("No product found");
+                    }else{
+                        response.getWriter().write(strToJson(products));
+                    }
+                } catch (Exception e){
+                    throw new RuntimeException("Error");
+                }
         }
     }
+
 
     @Override
     public void doPost(SlingHttpServletRequest request, SlingHttpServletResponse response) throws ServletException, IOException {
@@ -92,7 +127,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> getProductByName(String name) {
+    public List<Product> getProductByWord(String name) {
         List<Product> products = productDao.getProductByWord(name);
         return products;
     }
@@ -104,8 +139,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> getProductByPrice(float price) {
-        List<Product> products = productDao.getProductByPrice(price);
+    public List<Product> getProductByPrice() {
+        List<Product> products = productDao.getProductByPrice();
         return products;
     }
 

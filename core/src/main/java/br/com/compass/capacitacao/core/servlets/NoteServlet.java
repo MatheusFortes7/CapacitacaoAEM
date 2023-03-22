@@ -21,17 +21,11 @@ import static org.apache.sling.api.servlets.ServletResolverConstants.*;
         property = {
                 SLING_SERVLET_METHODS + "=" + METHOD_GET,
                 SLING_SERVLET_RESOURCE_TYPES + "=" + "capacitacao/note",
-                SLING_SERVLET_EXTENSIONS + "=" + "json"
         })
 public class NoteServlet extends SlingAllMethodsServlet {
 
     @Reference
     private NoteService noteService;
-
-    @Activate
-    public NoteServlet(@Reference NoteService noteService) {
-        this.noteService = noteService;
-    }
 
     @Override
     protected void doGet(final SlingHttpServletRequest request, final SlingHttpServletResponse response) throws IOException, ServletException {

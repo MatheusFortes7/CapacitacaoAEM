@@ -24,17 +24,12 @@ import static org.apache.sling.api.servlets.ServletResolverConstants.*;
                 SLING_SERVLET_METHODS + "=" + METHOD_DELETE,
                 SLING_SERVLET_METHODS + "=" + METHOD_PUT,
                 SLING_SERVLET_RESOURCE_TYPES + "=" + "capacitacao/product",
-                SLING_SERVLET_EXTENSIONS + "=" + "json"
         })
 public class ProductServlet extends SlingAllMethodsServlet {
 
     @Reference
     private ProductService productService;
 
-    @Activate
-    public ProductServlet(@Reference ProductService productService) {
-        this.productService = productService;
-    }
 
     @Override
     protected void doGet(final SlingHttpServletRequest request, final SlingHttpServletResponse response) throws IOException, ServletException {

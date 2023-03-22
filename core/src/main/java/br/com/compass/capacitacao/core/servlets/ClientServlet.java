@@ -24,38 +24,33 @@ import static org.apache.sling.api.servlets.ServletResolverConstants.*;
             SLING_SERVLET_METHODS + "=" + METHOD_POST,
             SLING_SERVLET_METHODS + "=" + METHOD_DELETE,
             SLING_SERVLET_METHODS + "=" + METHOD_PUT,
-            SLING_SERVLET_RESOURCE_TYPES + "=" + "capacitacao/client",
-            SLING_SERVLET_EXTENSIONS + "=" + "json"
+            SLING_SERVLET_RESOURCE_TYPES + "=" + "capacitacao/client"
         })
 public class ClientServlet extends SlingAllMethodsServlet {
 
     @Reference
     private ClientService clientService;
 
-    @Activate
-    public ClientServlet(@Reference ClientService clientService) {
-        this.clientService = clientService;
-    }
-
 
     @Override
     protected void doGet(final SlingHttpServletRequest request, final SlingHttpServletResponse response) throws IOException, ServletException {
-        clientService.doGet(request, response);
+       clientService.doGet(request, response);
+        //response.getWriter().write("Hello World");
     }
 
     @Override
     protected void doPost(final SlingHttpServletRequest request, final SlingHttpServletResponse response) throws IOException, ServletException {
-        clientService.doPost(request, response);
+        //clientService.doPost(request, response);
     }
 
     @Override
     protected void doDelete(final SlingHttpServletRequest request, final SlingHttpServletResponse response) throws IOException, ServletException {
-        clientService.doDelete(request, response);
+        //clientService.doDelete(request, response);
     }
 
     @Override
     protected void doPut(final SlingHttpServletRequest request, final SlingHttpServletResponse response) throws IOException, ServletException {
-        clientService.doPut(request, response);
+        //clientService.doPut(request, response);
     }
 
 

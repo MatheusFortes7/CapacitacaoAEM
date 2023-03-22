@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 
 @Component(service = NoteDao.class, immediate = true)
@@ -20,11 +21,11 @@ public class NoteDaoImpl implements NoteDao{
     public List<Note> getNoteByClientId(int id) { //TODO: tratamento de exceções
         try(Connection connection = databaseService.getConnection()) {
             String sql = "SELECT * FROM nota WHERE idclient = ?";
-            List<Note> notes = null;
+            List<Note> notes = new LinkedList<>();
             try(PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setInt(1, id);
                 try(ResultSet resultSet = statement.executeQuery()) {
-                    if(resultSet.next()) {
+                    while (resultSet.next()) {
                         Note note = new Note();
                         note.setNumber(resultSet.getInt("number"));
                         note.setIdProduct(resultSet.getInt("idproduct"));
@@ -46,11 +47,11 @@ public class NoteDaoImpl implements NoteDao{
     public List<Note> getNoteByProductId(int id) {
         try(Connection connection = databaseService.getConnection()) {
             String sql = "SELECT * FROM nota WHERE idproduct = ?";
-            List<Note> notes = null;
+            List<Note> notes = new LinkedList<>();
             try(PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setInt(1, id);
                 try(ResultSet resultSet = statement.executeQuery()) {
-                    if(resultSet.next()) {
+                    while(resultSet.next()) {
                         Note note = new Note();
                         note.setNumber(resultSet.getInt("number"));
                         note.setIdProduct(resultSet.getInt("idproduct"));
@@ -71,10 +72,10 @@ public class NoteDaoImpl implements NoteDao{
     public List<Note> getAllNotes() { //TODO: tratamento de exceções
             try(Connection connection = databaseService.getConnection()) {
                 String sql = "SELECT * FROM nota";
-                List<Note> notes = null;
+                List<Note> notes = new LinkedList<>();
                 try(PreparedStatement statement = connection.prepareStatement(sql)) {
                     try(ResultSet resultSet = statement.executeQuery()) {
-                        if(resultSet.next()) {
+                        while (resultSet.next()) {
                             Note note = new Note();
                             note.setNumber(resultSet.getInt("number"));
                             note.setIdProduct(resultSet.getInt("idproduct"));

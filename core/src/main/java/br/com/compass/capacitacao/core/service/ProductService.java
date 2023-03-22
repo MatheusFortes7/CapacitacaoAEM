@@ -17,9 +17,9 @@ public interface ProductService {
 
     List<Product> getAllProduct();
     Product getProductById(int id);
-    List<Product> getProductByName(String name);
+    List<Product> getProductByWord(String name);
     List<Product> getProductByCategory(String category);
-    List<Product> getProductByPrice(float price);
+    List<Product> getProductByPrice();
     void addProduct(SlingHttpServletRequest request, SlingHttpServletResponse response);
     void updateProduct(SlingHttpServletRequest request, SlingHttpServletResponse response);
     void deleteProduct(SlingHttpServletRequest request, SlingHttpServletResponse response);
