@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspaceFilter version="1.0">
+    <filter root="/apps/capacitacao/clientlibs"/>
+    <filter root="/apps/capacitacao/components"/>
+    <filter root="/apps/capacitacao/i18n"/>
+</workspaceFilter>

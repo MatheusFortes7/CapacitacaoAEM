@@ -1,0 +1,7 @@
+{
+    "scripts": [
+        "create path (sling:OrderedFolder) /content/dam/capacitacao",
+        "create path (nt:unstructured) /content/dam/capacitacao/jcr:content",
+        "set properties on /content/dam/capacitacao/jcr:content\n  set cq:conf{String} to /conf/capacitacao\n  set jcr:title{String} to \"capacitacao\"\nend"
+    ]
+}
