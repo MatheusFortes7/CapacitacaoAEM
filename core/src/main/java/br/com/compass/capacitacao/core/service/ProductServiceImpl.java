@@ -148,7 +148,7 @@ public class ProductServiceImpl implements ProductService {
     public void addProduct(SlingHttpServletRequest request, SlingHttpServletResponse response) {
         try{
             BufferedReader reader = request.getReader();
-            Type type = new TypeToken<Product>(){}.getType();
+            Type type = new TypeToken<List<Product>>(){}.getType();//erro de tipo
             List<Product> products = null;
             try{
                 products = new Gson().fromJson(reader, type);
@@ -162,6 +162,7 @@ public class ProductServiceImpl implements ProductService {
                     throw new RuntimeException("Category is required");
                 } else {
                     productDao.addProduct(product);
+                    response.getWriter().write("Product added successfully");
                 }
             }
         } catch (IOException e) {

@@ -90,7 +90,7 @@ public class ClientServiceImpl implements ClientService{
     public void addClient(SlingHttpServletRequest request, SlingHttpServletResponse response) {
         try {
             BufferedReader reader = request.getReader();
-            Type type = new TypeToken<Client>() {}.getType();
+            Type type = new TypeToken<List<Client>>() {}.getType();
             List<Client> client = null;
             try {
                 client = new Gson().fromJson(reader, type);
@@ -101,7 +101,9 @@ public class ClientServiceImpl implements ClientService{
                 if(c.getName() == null || c.getName().isEmpty()){
                     throw new RuntimeException("Name is required");
                 } else {
+
                     clientDao.addClient(c);
+                    response.getWriter().write("Client added");
                 }
             }
         } catch (IOException e) {

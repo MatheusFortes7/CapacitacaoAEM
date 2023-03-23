@@ -40,7 +40,7 @@ public class ClientServlet extends SlingAllMethodsServlet {
 
     @Override
     protected void doPost(final SlingHttpServletRequest request, final SlingHttpServletResponse response) throws IOException, ServletException {
-        //clientService.doPost(request, response);
+        clientService.doPost(request, response);
     }
 
     @Override
