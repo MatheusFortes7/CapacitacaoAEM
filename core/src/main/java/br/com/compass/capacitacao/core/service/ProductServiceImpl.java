@@ -2,6 +2,8 @@ package br.com.compass.capacitacao.core.service;
 
 import br.com.compass.capacitacao.core.dao.NoteDao;
 import br.com.compass.capacitacao.core.dao.ProductDao;
+import br.com.compass.capacitacao.core.models.ErrorMessage;
+import br.com.compass.capacitacao.core.models.SucessMessage;
 import br.com.compass.capacitacao.core.models.Product;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -40,11 +42,11 @@ public class ProductServiceImpl implements ProductService {
             try{
                 id = Integer.parseInt(idString);
             } catch (Exception e){
-                throw new RuntimeException("Id must be a number");
+                response.getWriter().write(strToJson(new ErrorMessage("Id must be a number")));
             }
             Product products = getProductById(id);
             if(products == null){
-                response.getWriter().write("No product found");
+                response.getWriter().write(strToJson(new ErrorMessage("No product found")));
             }else{
                 response.getWriter().write(strToJson(products));
             }
@@ -52,45 +54,45 @@ public class ProductServiceImpl implements ProductService {
             try{
                 List<Product> products = getProductByWord(name);
                 if(products.size() == 0){
-                    response.getWriter().write("No product found");
+                    response.getWriter().write(strToJson(new ErrorMessage("No product found")));
                 }else{
                     response.getWriter().write(strToJson(products));
                 }
             } catch (Exception e){
-                throw new RuntimeException("Name must be a string");
+                response.getWriter().write(strToJson(new ErrorMessage("Name must be a string")));
             }
         }else if(category != null ){
             try{
                 List<Product> products = getProductByCategory(category);
                 if(products.size() == 0){
-                    response.getWriter().write("No product found");
+                    response.getWriter().write(strToJson(new ErrorMessage("No product found")));
                 }else{
                     response.getWriter().write(strToJson(products));
                 }
             } catch (Exception e){
-                throw new RuntimeException("Category must be a string");
+                response.getWriter().write(strToJson(new ErrorMessage("Category must be a string")));
             }
         }else if(price != null) {
             try{
                 List<Product> products = getProductByPrice();
                 if(products.size() == 0){
-                    response.getWriter().write("No product found");
+                    response.getWriter().write(strToJson(new ErrorMessage("No product found")));
                 }else{
                     response.getWriter().write(strToJson(products));
                 }
             } catch (Exception e){
-                throw new RuntimeException("Error");
+                response.getWriter().write(strToJson(new ErrorMessage("Price must be a number")));
             }
         }else{
                 try{
                     List<Product> products = getAllProduct();
                     if(products.size() == 0){
-                        response.getWriter().write("No product found");
+                        response.getWriter().write(strToJson(new ErrorMessage("No product found")));
                     }else{
                         response.getWriter().write(strToJson(products));
                     }
                 } catch (Exception e){
-                    throw new RuntimeException("Error");
+                    response.getWriter().write(strToJson(new ErrorMessage("Error")));
                 }
         }
     }
@@ -153,20 +155,31 @@ public class ProductServiceImpl implements ProductService {
             try{
                 products = new Gson().fromJson(reader, type);
             } catch (Exception e) {
-                e.printStackTrace();
+                response.getWriter().write(strToJson(new ErrorMessage("json error")));
+                return;
             }
-            for(Product product : products) {
-                if(product.getName() == null || product.getName().equals("")){
-                    throw new RuntimeException("Name is required");
-                } else if(product.getCategory() == null || product.getCategory().equals("")){
-                    throw new RuntimeException("Category is required");
-                } else {
-                    productDao.addProduct(product);
-                    response.getWriter().write("Product added successfully");
+            try{
+                for(Product product : products) {
+                    if(product.getName() == null || product.getName().equals("")){
+                        response.getWriter().write(strToJson(new ErrorMessage("Name is required")));
+                    } else if(product.getCategory() == null || product.getCategory().equals("")){
+                        response.getWriter().write(strToJson(new ErrorMessage("Category is required")));
+                    } else if(product.getPrice() == 0){
+                        response.getWriter().write(strToJson(new ErrorMessage("Price is required")));
+                    } else {
+                        productDao.addProduct(product);
+                        response.getWriter().write(strToJson(new SucessMessage("Product added")));
+                    }
                 }
+            } catch (Exception e) {
+                response.getWriter().write(strToJson(new ErrorMessage("Error")));
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            try {
+                response.getWriter().write(strToJson(new ErrorMessage("json error")));
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 
@@ -182,23 +195,23 @@ public class ProductServiceImpl implements ProductService {
         Product product;
         try{
             product = new Gson().fromJson(user, Product.class);
+            if(product.getId() == 0){
+                response.getWriter().write(strToJson(new ErrorMessage("Id is required")));
+            } else if(product.getName() == null || product.getName().isEmpty()){
+                response.getWriter().write(strToJson(new ErrorMessage("Name is required")));
+            } else if(product.getCategory() == null || product.getCategory().isEmpty()){
+                response.getWriter().write(strToJson(new ErrorMessage("Category is required")));
+            } else if(productDao.getProductById(product.getId()) == null){
+                response.getWriter().write(strToJson(new ErrorMessage("Product not found")));
+            } else {
+                productDao.updateProduct(product);
+                response.getWriter().write(strToJson(new SucessMessage("Product updated")));
+            }
         } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        if(product.getId() == 0){
-            throw new RuntimeException("Id is required");
-        } else if(product.getName() == null || product.getName().isEmpty()){
-            throw new RuntimeException("Name is required");
-        } else if(product.getCategory() == null || product.getCategory().isEmpty()){
-            throw new RuntimeException("Category is required");
-        } else if(productDao.getProductById(product.getId()) == null){
-            throw new RuntimeException("Product not found");
-        } else {
-            productDao.updateProduct(product);
             try {
-                response.getWriter().write("Product updated successfully");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                response.getWriter().write(strToJson(new ErrorMessage("json error")));
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
             }
         }
     }
@@ -212,20 +225,29 @@ public class ProductServiceImpl implements ProductService {
             try{
                 products = new Gson().fromJson(reader, type);
             } catch (Exception e) {
-                e.printStackTrace();
+                response.getWriter().write(strToJson(new ErrorMessage("json error")));
+                return;
             }
             for(Product product : products) {
-                if(productDao.getProductById(product.getId()) == null){
-                    throw new RuntimeException("Product not found");
-                } else {
-                    if(noteDao.getNoteByProductId(product.getId()) != null)
-                        noteDao.deleteNoteByProductId(product.getId());
-                    productDao.deleteProduct(product.getId());
-                    response.getWriter().write("Product deleted successfully");
+                try{
+                    if(productDao.getProductById(product.getId()) == null){
+                        response.getWriter().write(strToJson(new ErrorMessage("Product not found")));
+                    } else {
+                        if(noteDao.getNoteByProductId(product.getId()) != null)
+                            noteDao.deleteNoteByProductId(product.getId());
+                        productDao.deleteProduct(product.getId());
+                        response.getWriter().write(strToJson(new SucessMessage("Product deleted")));
+                    }
+                } catch (Exception e) {
+                    response.getWriter().write(strToJson(new ErrorMessage("Error")));
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            try {
+                response.getWriter().write(strToJson(new ErrorMessage("json error")));
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 

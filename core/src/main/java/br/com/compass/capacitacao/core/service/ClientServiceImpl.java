@@ -3,6 +3,8 @@ package br.com.compass.capacitacao.core.service;
 import br.com.compass.capacitacao.core.dao.ClientDao;
 import br.com.compass.capacitacao.core.dao.NoteDao;
 import br.com.compass.capacitacao.core.models.Client;
+import br.com.compass.capacitacao.core.models.ErrorMessage;
+import br.com.compass.capacitacao.core.models.SucessMessage;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.sling.api.SlingHttpServletRequest;
@@ -35,23 +37,23 @@ public class ClientServiceImpl implements ClientService{
         if(id != null){
             try{
                 if(getClientById(Integer.parseInt(id)) == null){
-                    response.getWriter().write("No client found");
+                    response.getWriter().write(strToJson(new ErrorMessage("No client found")));
                 } else {
                     response.getWriter().write(strToJson(getClientById(Integer.parseInt(id))));
                 }
             } catch (Exception e){
-                throw new RuntimeException("Id must be a number");
+                response.getWriter().write(strToJson(new ErrorMessage("Id must be a number")));
             }
         }else{
             try{
                 List<Client> clients = getAllClient();
                 if(clients.size() == 0){
-                    response.getWriter().write("No client found");
+                    response.getWriter().write(strToJson(new ErrorMessage("No client found")));
                 } else {
                     response.getWriter().write(strToJson(clients));
                 }
             } catch (Exception e){
-                throw new RuntimeException("Error");
+                response.getWriter().write(strToJson(new ErrorMessage("Error")));
             }
         }
     }
@@ -95,19 +97,24 @@ public class ClientServiceImpl implements ClientService{
             try {
                 client = new Gson().fromJson(reader, type);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                response.getWriter().write(strToJson(new ErrorMessage("Json error")));
+                return;
             }
             for(Client c : client){
                 if(c.getName() == null || c.getName().isEmpty()){
-                    throw new RuntimeException("Name is required");
+                    response.getWriter().write(strToJson(new ErrorMessage("Name is required")));
                 } else {
 
                     clientDao.addClient(c);
-                    response.getWriter().write("Client added");
+                    response.getWriter().write(strToJson(new SucessMessage("Client added")));
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
+            try {
+                response.getWriter().write(strToJson(new ErrorMessage("Json error")));
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         }
 
     }
@@ -124,19 +131,23 @@ public class ClientServiceImpl implements ClientService{
         try{
             client = new Gson().fromJson(user, Client.class);
             if(client.getName() == null || client.getName().isEmpty()){
-                throw new RuntimeException("Name is required");
+                response.getWriter().write(strToJson(new ErrorMessage("Name is required")));
             } else {
                 if(client.getId() == 0){
-                    throw new RuntimeException("Id is required");
+                    response.getWriter().write(strToJson(new ErrorMessage("Id is required")));
                 } else if(clientDao.getClientById(client.getId()) == null){
-                    throw new RuntimeException("Client not found");
+                    response.getWriter().write(strToJson(new ErrorMessage("Client not found")));
                 } else {
                     clientDao.updateClient(client);
-                    response.getWriter().write("Client updated");
+                    response.getWriter().write(strToJson(new SucessMessage("Client updated")));
                 }
             }
         } catch (Exception e){
-            throw new RuntimeException(e);
+            try {
+                response.getWriter().write(strToJson(new ErrorMessage("Json error")));
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 
@@ -149,22 +160,30 @@ public class ClientServiceImpl implements ClientService{
             try {
                 client = new Gson().fromJson(reader, type);
             } catch (Exception e) {
-                throw new RuntimeException(e.getMessage());
+                response.getWriter().write(strToJson(new ErrorMessage("Json error / " + e.getMessage())));
+                return;
             }
             for(Client c : client){
-                response.getWriter().write("Cheguei no for");
-                if(clientDao.getClientById(c.getId()) == null){
-                    throw new RuntimeException("Client not found");
-                } else {
-                    if(noteDao.getNoteByClientId(c.getId()) != null){
-                        noteDao.deleteNoteByClientId(c.getId());
+                try{
+                    if(clientDao.getClientById(c.getId()) == null){
+                        response.getWriter().write(strToJson(new ErrorMessage("Client not found")));
+                    } else {
+                        if(noteDao.getNoteByClientId(c.getId()) != null){
+                            noteDao.deleteNoteByClientId(c.getId());
+                        }
+                        clientDao.deleteClient(c.getId());
+                        response.getWriter().write(strToJson(new SucessMessage("Client deleted")));
                     }
-                    clientDao.deleteClient(c.getId());
-                    response.getWriter().write("Client deleted");
+                } catch (Exception e){
+                    response.getWriter().write(strToJson(new ErrorMessage("Error")));
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
+            try {
+                response.getWriter().write(strToJson(new ErrorMessage("Error" + e.getMessage())));
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 

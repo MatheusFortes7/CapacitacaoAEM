@@ -1,6 +1,7 @@
 package br.com.compass.capacitacao.core.service;
 
 import br.com.compass.capacitacao.core.dao.NoteDao;
+import br.com.compass.capacitacao.core.models.ErrorMessage;
 import br.com.compass.capacitacao.core.models.Note;
 import com.google.gson.Gson;
 import org.apache.sling.api.SlingHttpServletRequest;
@@ -31,20 +32,20 @@ public class NoteServiceImpl implements NoteService{
                 if(note.size() > 0){
                     response.getWriter().write(strToJson(note));
                 }else{
-                    response.getWriter().write(strToJson("No notes found for this id"));
+                    response.getWriter().write(strToJson(new ErrorMessage("No notes found")));
                 }
             } catch (Exception e){
-                throw new RuntimeException("Id must be a number");
+                response.getWriter().write(strToJson(new ErrorMessage("Id must be a number")));
             }
         }else{
             try{
                 if(getAllNote().size() > 0){
                     response.getWriter().write(strToJson(getAllNote()));
                 }else{
-                    response.getWriter().write(strToJson("No notes found"));
+                    response.getWriter().write(strToJson(new ErrorMessage("No notes found")));
                 }
             } catch (Exception e){
-                throw new RuntimeException("Error");
+                response.getWriter().write(strToJson(new ErrorMessage("Error")));
             }
         }
     }
