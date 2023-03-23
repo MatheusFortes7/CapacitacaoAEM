@@ -7,9 +7,9 @@ import org.apache.sling.models.annotations.Model;
 @Model(adaptables = Resource.class )
 public class ErrorMessage {
 
-    private String message;
+    private String ErrorMessage;
 
     public ErrorMessage(String message) {
-        this.message = message;
+        this.ErrorMessage = message;
     }
 }

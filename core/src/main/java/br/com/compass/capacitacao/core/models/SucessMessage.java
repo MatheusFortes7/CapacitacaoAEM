@@ -6,9 +6,9 @@ import org.apache.sling.models.annotations.Model;
 @Model(adaptables = Resource.class)
 public class SucessMessage {
 
-        private String message;
+        private String SuccessMessage;
 
         public SucessMessage(String message) {
-            this.message = message;
+            this.SuccessMessage = message;
         }
 }
