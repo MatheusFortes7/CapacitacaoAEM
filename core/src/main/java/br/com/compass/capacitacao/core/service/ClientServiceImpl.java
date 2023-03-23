@@ -143,7 +143,7 @@ public class ClientServiceImpl implements ClientService{
     public void deleteClient(SlingHttpServletRequest request, SlingHttpServletResponse response) {
         try{
             BufferedReader reader = request.getReader();
-            Type type = new TypeToken<Client>() {}.getType();
+            Type type = new TypeToken<List<Client>>() {}.getType();
             List<Client> client = null;
             try {
                 client = new Gson().fromJson(reader, type);
@@ -151,6 +151,7 @@ public class ClientServiceImpl implements ClientService{
                 throw new RuntimeException(e.getMessage());
             }
             for(Client c : client){
+                response.getWriter().write("Cheguei no for");
                 if(clientDao.getClientById(c.getId()) == null){
                     throw new RuntimeException("Client not found");
                 } else {
@@ -158,6 +159,7 @@ public class ClientServiceImpl implements ClientService{
                         noteDao.deleteNoteByClientId(c.getId());
                     }
                     clientDao.deleteClient(c.getId());
+                    response.getWriter().write("Client deleted");
                 }
             }
         } catch (IOException e) {

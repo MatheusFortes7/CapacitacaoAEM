@@ -45,7 +45,7 @@ public class ClientServlet extends SlingAllMethodsServlet {
 
     @Override
     protected void doDelete(final SlingHttpServletRequest request, final SlingHttpServletResponse response) throws IOException, ServletException {
-        //clientService.doDelete(request, response);
+        clientService.doDelete(request, response);
     }
 
     @Override

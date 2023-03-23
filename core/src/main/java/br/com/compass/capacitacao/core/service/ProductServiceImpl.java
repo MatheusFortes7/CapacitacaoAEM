@@ -202,7 +202,7 @@ public class ProductServiceImpl implements ProductService {
     public void deleteProduct(SlingHttpServletRequest request, SlingHttpServletResponse response) {
         try{
             BufferedReader reader = request.getReader();
-            Type type = new TypeToken<Product>(){}.getType();
+            Type type = new TypeToken<List<Product>>(){}.getType();
             List<Product> products = null;
             try{
                 products = new Gson().fromJson(reader, type);
@@ -216,6 +216,7 @@ public class ProductServiceImpl implements ProductService {
                     if(noteDao.getNoteByProductId(product.getId()) != null)
                         noteDao.deleteNoteByProductId(product.getId());
                     productDao.deleteProduct(product.getId());
+                    response.getWriter().write("Product deleted successfully");
                 }
             }
         } catch (IOException e) {
