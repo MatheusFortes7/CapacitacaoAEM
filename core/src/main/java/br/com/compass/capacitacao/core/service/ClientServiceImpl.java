@@ -132,6 +132,7 @@ public class ClientServiceImpl implements ClientService{
                     throw new RuntimeException("Client not found");
                 } else {
                     clientDao.updateClient(client);
+                    response.getWriter().write("Client updated");
                 }
             }
         } catch (Exception e){

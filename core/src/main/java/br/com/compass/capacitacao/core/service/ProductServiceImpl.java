@@ -195,6 +195,11 @@ public class ProductServiceImpl implements ProductService {
             throw new RuntimeException("Product not found");
         } else {
             productDao.updateProduct(product);
+            try {
+                response.getWriter().write("Product updated successfully");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
