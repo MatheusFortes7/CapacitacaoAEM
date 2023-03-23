@@ -37,22 +37,28 @@ public class ClientServiceImpl implements ClientService{
         if(id != null){
             try{
                 if(getClientById(Integer.parseInt(id)) == null){
+                    response.setStatus(404);
                     response.getWriter().write(strToJson(new ErrorMessage("No client found")));
                 } else {
+                    response.setStatus(200);
                     response.getWriter().write(strToJson(getClientById(Integer.parseInt(id))));
                 }
             } catch (Exception e){
+                response.setStatus(400);
                 response.getWriter().write(strToJson(new ErrorMessage("Id must be a number")));
             }
         }else{
             try{
                 List<Client> clients = getAllClient();
                 if(clients.size() == 0){
+                    response.setStatus(404);
                     response.getWriter().write(strToJson(new ErrorMessage("No client found")));
                 } else {
+                    response.setStatus(200);
                     response.getWriter().write(strToJson(clients));
                 }
             } catch (Exception e){
+                response.setStatus(400);
                 response.getWriter().write(strToJson(new ErrorMessage("Error")));
             }
         }
@@ -97,20 +103,24 @@ public class ClientServiceImpl implements ClientService{
             try {
                 client = new Gson().fromJson(reader, type);
             } catch (Exception e) {
+                response.setStatus(400);
                 response.getWriter().write(strToJson(new ErrorMessage("Json error")));
                 return;
             }
             for(Client c : client){
                 if(c.getName() == null || c.getName().isEmpty()){
+                    response.setStatus(400);
                     response.getWriter().write(strToJson(new ErrorMessage("Name is required")));
                 } else {
 
                     clientDao.addClient(c);
+                    response.setStatus(201);
                     response.getWriter().write(strToJson(new SucessMessage("Client added")));
                 }
             }
         } catch (IOException e) {
             try {
+                response.setStatus(400);
                 response.getWriter().write(strToJson(new ErrorMessage("Json error")));
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
@@ -131,21 +141,27 @@ public class ClientServiceImpl implements ClientService{
         try{
             client = new Gson().fromJson(user, Client.class);
             if(client.getName() == null || client.getName().isEmpty()){
+                response.setStatus(400);
                 response.getWriter().write(strToJson(new ErrorMessage("Name is required")));
             } else {
                 if(client.getId() == 0){
+                    response.setStatus(400);
                     response.getWriter().write(strToJson(new ErrorMessage("Id is required")));
                 } else if(clientDao.getClientById(client.getId()) == null){
+                    response.setStatus(404);
                     response.getWriter().write(strToJson(new ErrorMessage("Client not found")));
                 } else {
                     clientDao.updateClient(client);
+                    response.setStatus(202);
                     response.getWriter().write(strToJson(new SucessMessage("Client updated")));
                 }
             }
         } catch (Exception e){
             try {
+                response.setStatus(400);
                 response.getWriter().write(strToJson(new ErrorMessage("Json error")));
             } catch (IOException ex) {
+                response.setStatus(400);
                 throw new RuntimeException(ex);
             }
         }
@@ -160,26 +176,31 @@ public class ClientServiceImpl implements ClientService{
             try {
                 client = new Gson().fromJson(reader, type);
             } catch (Exception e) {
+                response.setStatus(400);
                 response.getWriter().write(strToJson(new ErrorMessage("Json error / " + e.getMessage())));
                 return;
             }
             for(Client c : client){
                 try{
                     if(clientDao.getClientById(c.getId()) == null){
+                        response.setStatus(400);
                         response.getWriter().write(strToJson(new ErrorMessage("Client not found")));
                     } else {
                         if(noteDao.getNoteByClientId(c.getId()) != null){
                             noteDao.deleteNoteByClientId(c.getId());
                         }
                         clientDao.deleteClient(c.getId());
+                        response.setStatus(202);
                         response.getWriter().write(strToJson(new SucessMessage("Client deleted")));
                     }
                 } catch (Exception e){
+                    response.setStatus(400);
                     response.getWriter().write(strToJson(new ErrorMessage("Error")));
                 }
             }
         } catch (IOException e) {
             try {
+                response.setStatus(400);
                 response.getWriter().write(strToJson(new ErrorMessage("Error" + e.getMessage())));
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
