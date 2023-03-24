@@ -5,7 +5,6 @@ import br.com.compass.capacitacao.core.dao.ProductDao;
 import br.com.compass.capacitacao.core.models.Product;
 import br.com.compass.capacitacao.core.utils.ResponseContent;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
 import org.apache.tika.io.IOUtils;
@@ -13,9 +12,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import javax.servlet.ServletException;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.List;
 
 @Component(immediate = true, service = ProductService.class)
@@ -24,7 +21,7 @@ public class ProductServiceImpl implements ProductService {
     @Reference
     private DatabaseService databaseService;
     @Reference
-    final private ResponseContent responseContent = new ResponseContent();
+    private ResponseContent responseContent = new ResponseContent();
     @Reference
     private ProductDao productDao;
     @Reference
@@ -145,11 +142,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void addProduct(SlingHttpServletRequest request, SlingHttpServletResponse response) {
         try{
-            final BufferedReader reader = request.getReader();
-            final Type type = new TypeToken<List<Product>>(){}.getType();
-            List<Product> products = null;
+            Product[] products = null;
             try{
-                products = new Gson().fromJson(reader, type);
+                products = new Gson().fromJson(responseContent.readJson(request,response), Product[].class);
             } catch (Exception e) {
                 responseContent.FinalMesage(400, "Error", response);
                 return;
@@ -214,11 +209,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void deleteProduct(SlingHttpServletRequest request, SlingHttpServletResponse response) {
         try{
-            final BufferedReader reader = request.getReader();
-            final Type type = new TypeToken<List<Product>>(){}.getType();
-            List<Product> products = null;
+            Product[] products = null;
             try{
-                products = new Gson().fromJson(reader, type);
+                products = new Gson().fromJson(responseContent.readJson(request,response), Product[].class);
             } catch (Exception e) {
                 responseContent.FinalMesage(400, "Error", response);
                 return;

@@ -4,10 +4,8 @@ import br.com.compass.capacitacao.core.dao.ClientDao;
 import br.com.compass.capacitacao.core.dao.NoteDao;
 import br.com.compass.capacitacao.core.models.Client;
 import br.com.compass.capacitacao.core.models.ErrorMessage;
-import br.com.compass.capacitacao.core.models.SucessMessage;
 import br.com.compass.capacitacao.core.utils.ResponseContent;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
 import org.apache.tika.io.IOUtils;
@@ -15,9 +13,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import javax.servlet.ServletException;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.List;
 
 @Component(immediate = true, service = ClientService.class)
@@ -26,7 +22,7 @@ public class ClientServiceImpl implements ClientService{
     @Reference
     private DatabaseService databaseService;
     @Reference
-    final private ResponseContent responseContent = new ResponseContent();
+    private ResponseContent responseContent = new ResponseContent();
     @Reference
     private ClientDao clientDao;
     @Reference
@@ -89,11 +85,9 @@ public class ClientServiceImpl implements ClientService{
     @Override
     public void addClient(SlingHttpServletRequest request, SlingHttpServletResponse response) {
         try {
-            final BufferedReader reader = request.getReader();
-            final Type type = new TypeToken<List<Client>>() {}.getType();
-            List<Client> client = null;
+            Client[] client = null;
             try {
-                client = new Gson().fromJson(reader, type);
+                client = new Gson().fromJson(responseContent.readJson(request, response), Client[].class);
             } catch (Exception e) {
                 responseContent.FinalMesage(400, "Json error", response);
                 return;
@@ -113,11 +107,9 @@ public class ClientServiceImpl implements ClientService{
                 throw new RuntimeException(ex);
             }
         }
-
     }
     @Override
     public void updateClient(SlingHttpServletRequest request, SlingHttpServletResponse response) {
-        response.setCharacterEncoding("UTF-8");
         String user = null;
         try{
             user = IOUtils.toString(request.getReader());
@@ -151,11 +143,9 @@ public class ClientServiceImpl implements ClientService{
     @Override
     public void deleteClient(SlingHttpServletRequest request, SlingHttpServletResponse response) {
         try{
-            final BufferedReader reader = request.getReader();
-            final Type type = new TypeToken<List<Client>>() {}.getType();
-            List<Client> client = null;
+            Client[] client = null;
             try {
-                client = new Gson().fromJson(reader, type);
+                client = new Gson().fromJson(responseContent.readJson(request, response), Client[].class);
             } catch (Exception e) {
                 responseContent.FinalMesage(400, "Json error", response);
                 return;

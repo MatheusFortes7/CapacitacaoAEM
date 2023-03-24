@@ -19,7 +19,7 @@ public class NoteServiceImpl implements NoteService{
     @Reference
     private DatabaseService databaseService;
     @Reference
-    final private ResponseContent responseContent = new ResponseContent();
+    private ResponseContent responseContent = new ResponseContent();
     @Reference
     private NoteDao noteDao;
 
