@@ -5,6 +5,7 @@ import br.com.compass.capacitacao.core.dao.NoteDao;
 import br.com.compass.capacitacao.core.models.Client;
 import br.com.compass.capacitacao.core.models.ErrorMessage;
 import br.com.compass.capacitacao.core.models.SucessMessage;
+import br.com.compass.capacitacao.core.utils.ResponseContent;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.sling.api.SlingHttpServletRequest;
@@ -24,7 +25,8 @@ public class ClientServiceImpl implements ClientService{
 
     @Reference
     private DatabaseService databaseService;
-
+    @Reference
+    private ResponseContent responseContent = new ResponseContent();
     @Reference
     private ClientDao clientDao;
     @Reference
@@ -32,66 +34,56 @@ public class ClientServiceImpl implements ClientService{
 
     @Override
     public void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json");
         String id = request.getParameter("id");
         if(id != null){
             try{
                 if(getClientById(Integer.parseInt(id)) == null){
-                    response.setStatus(404);
-                    response.getWriter().write(strToJson(new ErrorMessage("No client found")));
+                    responseContent.FinalMesage(400, "No client found", response);
                 } else {
-                    response.setStatus(200);
+                    responseContent.getRequest(200, response);
                     response.getWriter().write(strToJson(getClientById(Integer.parseInt(id))));
                 }
             } catch (Exception e){
-                response.setStatus(400);
-                response.getWriter().write(strToJson(new ErrorMessage("Id must be a number")));
+                responseContent.FinalMesage(400, "Id must be a number", response);
             }
         }else{
             try{
-                List<Client> clients = getAllClient();
+                List<Client> clients = getAllClients();
                 if(clients.size() == 0){
-                    response.setStatus(404);
-                    response.getWriter().write(strToJson(new ErrorMessage("No client found")));
+                    responseContent.FinalMesage(400, "No client found", response);
                 } else {
-                    response.setStatus(200);
+                    responseContent.getRequest(200, response);
                     response.getWriter().write(strToJson(clients));
                 }
             } catch (Exception e){
-                response.setStatus(400);
-                response.getWriter().write(strToJson(new ErrorMessage("Error")));
+                responseContent.FinalMesage(400, "Error", response);
             }
         }
     }
 
     @Override
     public void doPost(SlingHttpServletRequest request, SlingHttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json");
         addClient(request, response);
     }
 
     @Override
     public void doDelete(SlingHttpServletRequest request, SlingHttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json");
         deleteClient(request, response);
     }
 
     @Override
     public void doPut(SlingHttpServletRequest request, SlingHttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json");
         updateClient(request, response);
     }
 
     @Override
-    public List<Client> getAllClient() {
-        List<Client> clients = clientDao.getAllClients();
-        return clients;
+    public List<Client> getAllClients() {
+        return clientDao.getAllClients();
     }
 
     @Override
     public Client getClientById(int id) {
-        Client client = clientDao.getClientById(id);
-        return client;
+        return clientDao.getClientById(id);
     }
 
     @Override
@@ -103,25 +95,20 @@ public class ClientServiceImpl implements ClientService{
             try {
                 client = new Gson().fromJson(reader, type);
             } catch (Exception e) {
-                response.setStatus(400);
-                response.getWriter().write(strToJson(new ErrorMessage("Json error")));
+                responseContent.FinalMesage(400, "Json error", response);
                 return;
             }
             for(Client c : client){
                 if(c.getName() == null || c.getName().isEmpty()){
-                    response.setStatus(400);
-                    response.getWriter().write(strToJson(new ErrorMessage("Name is required")));
+                    responseContent.FinalMesage(400, "Name is required", response);
                 } else {
-
                     clientDao.addClient(c);
-                    response.setStatus(201);
-                    response.getWriter().write(strToJson(new SucessMessage("Client added")));
+                    responseContent.FinalMesage(200, "Client added", response);
                 }
             }
         } catch (IOException e) {
             try {
-                response.setStatus(400);
-                response.getWriter().write(strToJson(new ErrorMessage("Json error")));
+                responseContent.FinalMesage(400, "Json error", response);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
@@ -141,27 +128,21 @@ public class ClientServiceImpl implements ClientService{
         try{
             client = new Gson().fromJson(user, Client.class);
             if(client.getName() == null || client.getName().isEmpty()){
-                response.setStatus(400);
-                response.getWriter().write(strToJson(new ErrorMessage("Name is required")));
+                responseContent.FinalMesage(400, "Name is required", response);
             } else {
                 if(client.getId() == 0){
-                    response.setStatus(400);
-                    response.getWriter().write(strToJson(new ErrorMessage("Id is required")));
+                    responseContent.FinalMesage(400, "Id is required", response);
                 } else if(clientDao.getClientById(client.getId()) == null){
-                    response.setStatus(404);
-                    response.getWriter().write(strToJson(new ErrorMessage("Client not found")));
+                    responseContent.FinalMesage(400, "Client not found", response);
                 } else {
                     clientDao.updateClient(client);
-                    response.setStatus(202);
-                    response.getWriter().write(strToJson(new SucessMessage("Client updated")));
+                    responseContent.FinalMesage(200, "Client updated", response);
                 }
             }
         } catch (Exception e){
             try {
-                response.setStatus(400);
-                response.getWriter().write(strToJson(new ErrorMessage("Json error")));
+                responseContent.FinalMesage(400, "Json error", response);
             } catch (IOException ex) {
-                response.setStatus(400);
                 throw new RuntimeException(ex);
             }
         }
@@ -176,22 +157,19 @@ public class ClientServiceImpl implements ClientService{
             try {
                 client = new Gson().fromJson(reader, type);
             } catch (Exception e) {
-                response.setStatus(400);
-                response.getWriter().write(strToJson(new ErrorMessage("Json error / " + e.getMessage())));
+                responseContent.FinalMesage(400, "Json error", response);
                 return;
             }
             for(Client c : client){
                 try{
                     if(clientDao.getClientById(c.getId()) == null){
-                        response.setStatus(400);
-                        response.getWriter().write(strToJson(new ErrorMessage("Client not found")));
+                        responseContent.FinalMesage(400, "Client not found", response);
                     } else {
                         if(noteDao.getNoteByClientId(c.getId()) != null){
                             noteDao.deleteNoteByClientId(c.getId());
                         }
                         clientDao.deleteClient(c.getId());
-                        response.setStatus(202);
-                        response.getWriter().write(strToJson(new SucessMessage("Client deleted")));
+                        responseContent.FinalMesage(200, "Client deleted", response);
                     }
                 } catch (Exception e){
                     response.setStatus(400);
@@ -200,8 +178,7 @@ public class ClientServiceImpl implements ClientService{
             }
         } catch (IOException e) {
             try {
-                response.setStatus(400);
-                response.getWriter().write(strToJson(new ErrorMessage("Error" + e.getMessage())));
+                responseContent.FinalMesage(400, "Json error", response);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }

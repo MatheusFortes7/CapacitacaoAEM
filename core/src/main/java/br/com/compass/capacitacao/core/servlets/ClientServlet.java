@@ -5,7 +5,6 @@ import br.com.compass.capacitacao.core.service.ClientService;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
 import org.apache.sling.api.servlets.SlingAllMethodsServlet;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -31,11 +30,9 @@ public class ClientServlet extends SlingAllMethodsServlet {
     @Reference
     private ClientService clientService;
 
-
     @Override
     protected void doGet(final SlingHttpServletRequest request, final SlingHttpServletResponse response) throws IOException, ServletException {
        clientService.doGet(request, response);
-        //response.getWriter().write("Hello World");
     }
 
     @Override
@@ -52,6 +49,4 @@ public class ClientServlet extends SlingAllMethodsServlet {
     protected void doPut(final SlingHttpServletRequest request, final SlingHttpServletResponse response) throws IOException, ServletException {
         clientService.doPut(request, response);
     }
-
-
 }

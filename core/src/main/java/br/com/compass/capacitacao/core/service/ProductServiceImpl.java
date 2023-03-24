@@ -5,6 +5,7 @@ import br.com.compass.capacitacao.core.dao.ProductDao;
 import br.com.compass.capacitacao.core.models.ErrorMessage;
 import br.com.compass.capacitacao.core.models.SucessMessage;
 import br.com.compass.capacitacao.core.models.Product;
+import br.com.compass.capacitacao.core.utils.ResponseContent;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.sling.api.SlingHttpServletRequest;
@@ -24,7 +25,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Reference
     private DatabaseService databaseService;
-
+    @Reference
+    private ResponseContent responseContent = new ResponseContent();
     @Reference
     private ProductDao productDao;
     @Reference
@@ -32,7 +34,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json");
         String idString = request.getParameter("id");
         String name = request.getParameter("name");
         String category = request.getParameter("category");
@@ -42,70 +43,62 @@ public class ProductServiceImpl implements ProductService {
             try{
                 id = Integer.parseInt(idString);
             } catch (Exception e){
-                response.setStatus(400);
-                response.getWriter().write(strToJson(new ErrorMessage("Id must be a number")));
+                responseContent.FinalMesage(400, "Id must be a number", response);
             }
             Product products = getProductById(id);
             if(products == null){
-                response.setStatus(404);
-                response.getWriter().write(strToJson(new ErrorMessage("No product found")));
+                responseContent.FinalMesage(400, "No product found", response);
             }else{
-                response.setStatus(200);
+                responseContent.getRequest(200, response);
                 response.getWriter().write(strToJson(products));
             }
         }else if(name != null ){
             try{
                 List<Product> products = getProductByWord(name);
                 if(products.size() == 0){
-                    response.setStatus(404);
-                    response.getWriter().write(strToJson(new ErrorMessage("No product found")));
+                    responseContent.FinalMesage(400, "No product found", response);
                 }else{
-                    response.setStatus(200);
+                    responseContent.getRequest(200, response);
                     response.getWriter().write(strToJson(products));
                 }
             } catch (Exception e){
-                response.setStatus(400);
-                response.getWriter().write(strToJson(new ErrorMessage("Name must be a string")));
+                responseContent.FinalMesage(400, "Name must be a string", response);
             }
         }else if(category != null ){
             try{
                 List<Product> products = getProductByCategory(category);
                 if(products.size() == 0){
-                    response.setStatus(404);
-                    response.getWriter().write(strToJson(new ErrorMessage("No product found")));
+                    responseContent.FinalMesage(400, "No product found", response);
                 }else{
+                    responseContent.getRequest(200, response);
                     response.getWriter().write(strToJson(products));
                 }
             } catch (Exception e){
-                response.setStatus(400);
-                response.getWriter().write(strToJson(new ErrorMessage("Category must be a string")));
+                responseContent.FinalMesage(400, "Category must be a string", response);
             }
         }else if(price != null) {
             try{
                 List<Product> products = getProductByPrice();
                 if(products.size() == 0){
-                    response.setStatus(404);
-                    response.getWriter().write(strToJson(new ErrorMessage("No product found")));
+                    responseContent.FinalMesage(400, "No product found", response);
                 }else{
+                    responseContent.getRequest(200, response);
                     response.getWriter().write(strToJson(products));
                 }
             } catch (Exception e){
-                response.setStatus(400);
-                response.getWriter().write(strToJson(new ErrorMessage("Price must be a number")));
+                responseContent.FinalMesage(400, "Price must be a number", response);
             }
         }else{
                 try{
                     List<Product> products = getAllProduct();
                     if(products.size() == 0){
-                        response.setStatus(404);
-                        response.getWriter().write(strToJson(new ErrorMessage("No product found")));
+                        responseContent.FinalMesage(400, "No product found", response);
                     }else{
-                        response.setStatus(200);
+                        responseContent.getRequest(200, response);
                         response.getWriter().write(strToJson(products));
                     }
                 } catch (Exception e){
-                    response.setStatus(400);
-                    response.getWriter().write(strToJson(new ErrorMessage("Error")));
+                    responseContent.FinalMesage(400, "Error", response);
                 }
         }
     }
@@ -113,50 +106,42 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void doPost(SlingHttpServletRequest request, SlingHttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json");
         addProduct(request, response);
     }
 
     @Override
     public void doDelete(SlingHttpServletRequest request, SlingHttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json");
         deleteProduct(request, response);
     }
 
     @Override
     public void doPut(SlingHttpServletRequest request, SlingHttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json");
         updateProduct(request, response);
     }
 
     @Override
     public List<Product> getAllProduct() {
-        List<Product> products = productDao.getAllProducts();
-        return products;
+        return productDao.getAllProducts();
     }
 
     @Override
     public Product getProductById(int id) {
-        Product product = productDao.getProductById(id);
-        return product;
+        return productDao.getProductById(id);
     }
 
     @Override
     public List<Product> getProductByWord(String name) {
-        List<Product> products = productDao.getProductByWord(name);
-        return products;
+        return productDao.getProductByWord(name);
     }
 
     @Override
     public List<Product> getProductByCategory(String category) {
-        List<Product> products = productDao.getProductByCategory(category);
-        return products;
+        return productDao.getProductByCategory(category);
     }
 
     @Override
     public List<Product> getProductByPrice() {
-        List<Product> products = productDao.getProductByPrice();
-        return products;
+        return productDao.getProductByPrice();
     }
 
     @Override
@@ -168,35 +153,28 @@ public class ProductServiceImpl implements ProductService {
             try{
                 products = new Gson().fromJson(reader, type);
             } catch (Exception e) {
-                response.setStatus(400);
-                response.getWriter().write(strToJson(new ErrorMessage("json error")));
+                responseContent.FinalMesage(400, "Error", response);
                 return;
             }
             try{
                 for(Product product : products) {
                     if(product.getName() == null || product.getName().equals("")){
-                        response.setStatus(400);
-                        response.getWriter().write(strToJson(new ErrorMessage("Name is required")));
+                        responseContent.FinalMesage(400, "Name is required", response);
                     } else if(product.getCategory() == null || product.getCategory().equals("")){
-                        response.setStatus(400);
-                        response.getWriter().write(strToJson(new ErrorMessage("Category is required")));
+                        responseContent.FinalMesage(400, "Category is required", response);
                     } else if(product.getPrice() == 0){
-                        response.setStatus(400);
-                        response.getWriter().write(strToJson(new ErrorMessage("Price is required")));
+                        responseContent.FinalMesage(400, "Price is required", response);
                     } else {
                         productDao.addProduct(product);
-                        response.setStatus(201);
-                        response.getWriter().write(strToJson(new SucessMessage("Product added")));
+                        responseContent.FinalMesage(200, "Product added", response);
                     }
                 }
             } catch (Exception e) {
-                response.setStatus(400);
-                response.getWriter().write(strToJson(new ErrorMessage("Error")));
+                responseContent.FinalMesage(400, "Error", response);
             }
         } catch (IOException e) {
             try {
-                response.setStatus(400);
-                response.getWriter().write(strToJson(new ErrorMessage("json error")));
+                responseContent.FinalMesage(400, "Error", response);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
@@ -205,7 +183,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void updateProduct(SlingHttpServletRequest request, SlingHttpServletResponse response) {
-        response.setCharacterEncoding("UTF-8");
         String user = null;
         try{
             user = IOUtils.toString(request.getReader());
@@ -216,26 +193,20 @@ public class ProductServiceImpl implements ProductService {
         try{
             product = new Gson().fromJson(user, Product.class);
             if(product.getId() == 0){
-                response.setStatus(400);
-                response.getWriter().write(strToJson(new ErrorMessage("Id is required")));
+                responseContent.FinalMesage(400, "Id is required", response);
             } else if(product.getName() == null || product.getName().isEmpty()){
-                response.setStatus(400);
-                response.getWriter().write(strToJson(new ErrorMessage("Name is required")));
+                responseContent.FinalMesage(400, "Name is required", response);
             } else if(product.getCategory() == null || product.getCategory().isEmpty()){
-                response.setStatus(400);
-                response.getWriter().write(strToJson(new ErrorMessage("Category is required")));
+                responseContent.FinalMesage(400, "Category is required", response);
             } else if(productDao.getProductById(product.getId()) == null){
-                response.setStatus(404);
-                response.getWriter().write(strToJson(new ErrorMessage("Product not found")));
+                responseContent.FinalMesage(400, "Product not found", response);
             } else {
                 productDao.updateProduct(product);
-                response.setStatus(202);
-                response.getWriter().write(strToJson(new SucessMessage("Product updated")));
+                responseContent.FinalMesage(200, "Product updated", response);
             }
         } catch (Exception e) {
             try {
-                response.setStatus(400);
-                response.getWriter().write(strToJson(new ErrorMessage("json error")));
+                responseContent.FinalMesage(400, "Error", response);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
@@ -251,31 +222,26 @@ public class ProductServiceImpl implements ProductService {
             try{
                 products = new Gson().fromJson(reader, type);
             } catch (Exception e) {
-                response.setStatus(400);
-                response.getWriter().write(strToJson(new ErrorMessage("json error")));
+                responseContent.FinalMesage(400, "Error", response);
                 return;
             }
             for(Product product : products) {
                 try{
                     if(productDao.getProductById(product.getId()) == null){
-                        response.setStatus(404);
-                        response.getWriter().write(strToJson(new ErrorMessage("Product not found")));
+                        responseContent.FinalMesage(400, "Product not found", response);
                     } else {
                         if(noteDao.getNoteByProductId(product.getId()) != null)
                             noteDao.deleteNoteByProductId(product.getId());
                         productDao.deleteProduct(product.getId());
-                        response.setStatus(202);
-                        response.getWriter().write(strToJson(new SucessMessage("Product deleted")));
+                        responseContent.FinalMesage(200, "Product deleted", response);
                     }
                 } catch (Exception e) {
-                    response.setStatus(400);
-                    response.getWriter().write(strToJson(new ErrorMessage("Error")));
+                    responseContent.FinalMesage(400, "Error", response);
                 }
             }
         } catch (IOException e) {
             try {
-                response.setStatus(400);
-                response.getWriter().write(strToJson(new ErrorMessage("json error")));
+                responseContent.FinalMesage(400, "Error", response);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }

@@ -3,6 +3,7 @@ package br.com.compass.capacitacao.core.service;
 import br.com.compass.capacitacao.core.dao.NoteDao;
 import br.com.compass.capacitacao.core.models.ErrorMessage;
 import br.com.compass.capacitacao.core.models.Note;
+import br.com.compass.capacitacao.core.utils.ResponseContent;
 import com.google.gson.Gson;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
@@ -18,34 +19,36 @@ public class NoteServiceImpl implements NoteService{
 
     @Reference
     private DatabaseService databaseService;
-
+    @Reference
+    private ResponseContent responseContent = new ResponseContent();
     @Reference
     private NoteDao noteDao;
 
     @Override
     public void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json");
         String id = request.getParameter("id");
         if(id != null){
             try{
                 List<Note> note = getNoteByClientId(Integer.parseInt(id));
                 if(note.size() > 0){
+                    responseContent.getRequest(200, response);
                     response.getWriter().write(strToJson(note));
                 }else{
-                    response.getWriter().write(strToJson(new ErrorMessage("No notes found")));
+                    responseContent.FinalMesage(400, "No notes found", response);
                 }
             } catch (Exception e){
-                response.getWriter().write(strToJson(new ErrorMessage("Id must be a number")));
+                responseContent.FinalMesage(400, "Id must be a number", response);
             }
         }else{
             try{
                 if(getAllNote().size() > 0){
+                    responseContent.getRequest(200, response);
                     response.getWriter().write(strToJson(getAllNote()));
                 }else{
-                    response.getWriter().write(strToJson(new ErrorMessage("No notes found")));
+                    responseContent.FinalMesage(400, "No notes found", response);
                 }
             } catch (Exception e){
-                response.getWriter().write(strToJson(new ErrorMessage("Error")));
+                responseContent.FinalMesage(400, "Error", response);
             }
         }
     }
