@@ -26,7 +26,7 @@ public class ClientServiceImpl implements ClientService{
     @Reference
     private DatabaseService databaseService;
     @Reference
-    private ResponseContent responseContent = new ResponseContent();
+    final private ResponseContent responseContent = new ResponseContent();
     @Reference
     private ClientDao clientDao;
     @Reference
@@ -34,7 +34,7 @@ public class ClientServiceImpl implements ClientService{
 
     @Override
     public void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response) throws ServletException, IOException {
-        String id = request.getParameter("id");
+        final String id = request.getParameter("id");
         if(id != null){
             try{
                 if(getClientById(Integer.parseInt(id)) == null){
@@ -48,7 +48,7 @@ public class ClientServiceImpl implements ClientService{
             }
         }else{
             try{
-                List<Client> clients = getAllClients();
+                final List<Client> clients = getAllClients();
                 if(clients.size() == 0){
                     responseContent.FinalMesage(400, "No client found", response);
                 } else {
@@ -89,8 +89,8 @@ public class ClientServiceImpl implements ClientService{
     @Override
     public void addClient(SlingHttpServletRequest request, SlingHttpServletResponse response) {
         try {
-            BufferedReader reader = request.getReader();
-            Type type = new TypeToken<List<Client>>() {}.getType();
+            final BufferedReader reader = request.getReader();
+            final Type type = new TypeToken<List<Client>>() {}.getType();
             List<Client> client = null;
             try {
                 client = new Gson().fromJson(reader, type);
@@ -151,8 +151,8 @@ public class ClientServiceImpl implements ClientService{
     @Override
     public void deleteClient(SlingHttpServletRequest request, SlingHttpServletResponse response) {
         try{
-            BufferedReader reader = request.getReader();
-            Type type = new TypeToken<List<Client>>() {}.getType();
+            final BufferedReader reader = request.getReader();
+            final Type type = new TypeToken<List<Client>>() {}.getType();
             List<Client> client = null;
             try {
                 client = new Gson().fromJson(reader, type);

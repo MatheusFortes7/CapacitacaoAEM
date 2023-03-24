@@ -2,8 +2,6 @@ package br.com.compass.capacitacao.core.service;
 
 import br.com.compass.capacitacao.core.dao.NoteDao;
 import br.com.compass.capacitacao.core.dao.ProductDao;
-import br.com.compass.capacitacao.core.models.ErrorMessage;
-import br.com.compass.capacitacao.core.models.SucessMessage;
 import br.com.compass.capacitacao.core.models.Product;
 import br.com.compass.capacitacao.core.utils.ResponseContent;
 import com.google.gson.Gson;
@@ -26,7 +24,7 @@ public class ProductServiceImpl implements ProductService {
     @Reference
     private DatabaseService databaseService;
     @Reference
-    private ResponseContent responseContent = new ResponseContent();
+    final private ResponseContent responseContent = new ResponseContent();
     @Reference
     private ProductDao productDao;
     @Reference
@@ -34,10 +32,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response) throws ServletException, IOException {
-        String idString = request.getParameter("id");
-        String name = request.getParameter("name");
-        String category = request.getParameter("category");
-        String price = request.getParameter("price");
+        final String idString = request.getParameter("id");
+        final String name = request.getParameter("name");
+        final String category = request.getParameter("category");
+        final String price = request.getParameter("price");
         int id = 0;
         if(idString != null){
             try{
@@ -45,7 +43,7 @@ public class ProductServiceImpl implements ProductService {
             } catch (Exception e){
                 responseContent.FinalMesage(400, "Id must be a number", response);
             }
-            Product products = getProductById(id);
+            final Product products = getProductById(id);
             if(products == null){
                 responseContent.FinalMesage(400, "No product found", response);
             }else{
@@ -54,7 +52,7 @@ public class ProductServiceImpl implements ProductService {
             }
         }else if(name != null ){
             try{
-                List<Product> products = getProductByWord(name);
+                final List<Product> products = getProductByWord(name);
                 if(products.size() == 0){
                     responseContent.FinalMesage(400, "No product found", response);
                 }else{
@@ -66,7 +64,7 @@ public class ProductServiceImpl implements ProductService {
             }
         }else if(category != null ){
             try{
-                List<Product> products = getProductByCategory(category);
+                final List<Product> products = getProductByCategory(category);
                 if(products.size() == 0){
                     responseContent.FinalMesage(400, "No product found", response);
                 }else{
@@ -78,7 +76,7 @@ public class ProductServiceImpl implements ProductService {
             }
         }else if(price != null) {
             try{
-                List<Product> products = getProductByPrice();
+                final List<Product> products = getProductByPrice();
                 if(products.size() == 0){
                     responseContent.FinalMesage(400, "No product found", response);
                 }else{
@@ -90,7 +88,7 @@ public class ProductServiceImpl implements ProductService {
             }
         }else{
                 try{
-                    List<Product> products = getAllProduct();
+                    final List<Product> products = getAllProduct();
                     if(products.size() == 0){
                         responseContent.FinalMesage(400, "No product found", response);
                     }else{
@@ -147,8 +145,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void addProduct(SlingHttpServletRequest request, SlingHttpServletResponse response) {
         try{
-            BufferedReader reader = request.getReader();
-            Type type = new TypeToken<List<Product>>(){}.getType();//erro de tipo
+            final BufferedReader reader = request.getReader();
+            final Type type = new TypeToken<List<Product>>(){}.getType();
             List<Product> products = null;
             try{
                 products = new Gson().fromJson(reader, type);
@@ -216,8 +214,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void deleteProduct(SlingHttpServletRequest request, SlingHttpServletResponse response) {
         try{
-            BufferedReader reader = request.getReader();
-            Type type = new TypeToken<List<Product>>(){}.getType();
+            final BufferedReader reader = request.getReader();
+            final Type type = new TypeToken<List<Product>>(){}.getType();
             List<Product> products = null;
             try{
                 products = new Gson().fromJson(reader, type);

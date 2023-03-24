@@ -1,7 +1,6 @@
 package br.com.compass.capacitacao.core.service;
 
 import br.com.compass.capacitacao.core.dao.NoteDao;
-import br.com.compass.capacitacao.core.models.ErrorMessage;
 import br.com.compass.capacitacao.core.models.Note;
 import br.com.compass.capacitacao.core.utils.ResponseContent;
 import com.google.gson.Gson;
@@ -20,16 +19,16 @@ public class NoteServiceImpl implements NoteService{
     @Reference
     private DatabaseService databaseService;
     @Reference
-    private ResponseContent responseContent = new ResponseContent();
+    final private ResponseContent responseContent = new ResponseContent();
     @Reference
     private NoteDao noteDao;
 
     @Override
     public void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response) throws ServletException, IOException {
-        String id = request.getParameter("id");
+        final String id = request.getParameter("id");
         if(id != null){
             try{
-                List<Note> note = getNoteByClientId(Integer.parseInt(id));
+                final List<Note> note = getNoteByClientId(Integer.parseInt(id));
                 if(note.size() > 0){
                     responseContent.getRequest(200, response);
                     response.getWriter().write(strToJson(note));

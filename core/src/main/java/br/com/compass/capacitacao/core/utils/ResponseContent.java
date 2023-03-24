@@ -3,7 +3,6 @@ package br.com.compass.capacitacao.core.utils;
 import br.com.compass.capacitacao.core.models.ErrorMessage;
 import br.com.compass.capacitacao.core.models.SucessMessage;
 import com.google.gson.Gson;
-import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
 import org.osgi.service.component.annotations.Component;
 
@@ -12,7 +11,7 @@ import java.io.IOException;
 @Component(immediate = true, service = ResponseContent.class)
 public class ResponseContent {
 
-    public void FinalMesage(int status, String message, SlingHttpServletResponse response) throws IOException {
+    public void FinalMesage(final int status, final String message, final SlingHttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.setStatus(status);
@@ -25,7 +24,7 @@ public class ResponseContent {
         }
     }
 
-    public void getRequest(int status, SlingHttpServletResponse response) throws IOException {
+    public void getRequest(final int status, final SlingHttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.setStatus(200);
