@@ -31,7 +31,7 @@ public class ClientServlet extends SlingAllMethodsServlet {
     private ClientService clientService;
 
     @Override
-    protected void doGet(final SlingHttpServletRequest request, final SlingHttpServletResponse response) throws IOException, ServletException {
+    public void doGet(final SlingHttpServletRequest request, final SlingHttpServletResponse response) throws IOException, ServletException {
        clientService.doGet(request, response);
     }
 

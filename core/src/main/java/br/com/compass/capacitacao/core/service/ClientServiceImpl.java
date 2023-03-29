@@ -3,7 +3,6 @@ package br.com.compass.capacitacao.core.service;
 import br.com.compass.capacitacao.core.dao.ClientDao;
 import br.com.compass.capacitacao.core.dao.NoteDao;
 import br.com.compass.capacitacao.core.models.Client;
-import br.com.compass.capacitacao.core.models.ErrorMessage;
 import br.com.compass.capacitacao.core.utils.ResponseContent;
 import com.google.gson.Gson;
 import org.apache.sling.api.SlingHttpServletRequest;
@@ -27,6 +26,10 @@ public class ClientServiceImpl implements ClientService{
     private ClientDao clientDao;
     @Reference
     private NoteDao noteDao;
+
+    @Reference
+    Gson gson;
+
 
     @Override
     public void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response) throws ServletException, IOException {
@@ -131,7 +134,7 @@ public class ClientServiceImpl implements ClientService{
                     responseContent.FinalMesage(200, "Client updated", response);
                 }
             }
-        } catch (Exception e){
+        } catch (IOException e){
             try {
                 responseContent.FinalMesage(400, "Json error", response);
             } catch (IOException ex) {
@@ -151,19 +154,14 @@ public class ClientServiceImpl implements ClientService{
                 return;
             }
             for(Client c : client){
-                try{
-                    if(clientDao.getClientById(c.getId()) == null){
-                        responseContent.FinalMesage(400, "Client not found", response);
-                    } else {
-                        if(noteDao.getNoteByClientId(c.getId()) != null){
-                            noteDao.deleteNoteByClientId(c.getId());
-                        }
-                        clientDao.deleteClient(c.getId());
-                        responseContent.FinalMesage(200, "Client deleted", response);
+                if(clientDao.getClientById(c.getId()) == null){
+                    responseContent.FinalMesage(400, "Client not found", response);
+                } else {
+                    if(noteDao.getNoteByClientId(c.getId()) != null){
+                        noteDao.deleteNoteByClientId(c.getId());
                     }
-                } catch (Exception e){
-                    response.setStatus(400);
-                    response.getWriter().write(strToJson(new ErrorMessage("Error")));
+                    clientDao.deleteClient(c.getId());
+                    responseContent.FinalMesage(200, "Client deleted", response);
                 }
             }
         } catch (IOException e) {

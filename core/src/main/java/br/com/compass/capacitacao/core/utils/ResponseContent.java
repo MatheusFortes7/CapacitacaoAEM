@@ -29,7 +29,7 @@ public class ResponseContent {
     public void getRequest(final int status, final SlingHttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        response.setStatus(200);
+        response.setStatus(status);
     }
 
     public String readJson(SlingHttpServletRequest request, SlingHttpServletResponse response){

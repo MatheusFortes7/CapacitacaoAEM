@@ -34,8 +34,6 @@ public class NoteDaoImpl implements NoteDao{
                         notes.add(note);
                     }
                 }
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex.getMessage() + " Error getting the note by this client id.");
             }
             return notes;
         } catch (SQLException ex) {
@@ -60,8 +58,6 @@ public class NoteDaoImpl implements NoteDao{
                         notes.add(note);
                     }
                 }
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex.getMessage() + " Error getting the note by this client id.");
             }
             return notes;
         } catch (SQLException ex) {
@@ -84,8 +80,6 @@ public class NoteDaoImpl implements NoteDao{
                             notes.add(note);
                         }
                     }
-                } catch (SQLException ex) {
-                    throw new RuntimeException(ex.getMessage());
                 }
                 return notes;
             } catch (SQLException ex) {
@@ -101,8 +95,6 @@ public class NoteDaoImpl implements NoteDao{
             try(PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setInt(1, id);
                 statement.executeUpdate();
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex.getMessage() + " Error deleting the note by this client id.");
             }
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
@@ -117,8 +109,6 @@ public class NoteDaoImpl implements NoteDao{
             try(PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setInt(1, id);
                 statement.executeUpdate();
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex.getMessage() + " Error deleting the note by this product id.");
             }
         } catch (SQLException ex) {
             throw new RuntimeException(ex);

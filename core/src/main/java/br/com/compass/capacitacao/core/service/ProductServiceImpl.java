@@ -57,7 +57,7 @@ public class ProductServiceImpl implements ProductService {
                     response.getWriter().write(strToJson(products));
                 }
             } catch (Exception e){
-                responseContent.FinalMesage(400, "Name must be a string", response);
+                responseContent.FinalMesage(400, "Error trying to make json", response);
             }
         }else if(category != null ){
             try{
@@ -69,7 +69,7 @@ public class ProductServiceImpl implements ProductService {
                     response.getWriter().write(strToJson(products));
                 }
             } catch (Exception e){
-                responseContent.FinalMesage(400, "Category must be a string", response);
+                responseContent.FinalMesage(400, "Error in Json", response);
             }
         }else if(price != null) {
             try{
@@ -116,7 +116,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<Product> getAllProduct() {
-        return productDao.getAllProducts();
+         return productDao.getAllProducts();
     }
 
     @Override
@@ -149,21 +149,17 @@ public class ProductServiceImpl implements ProductService {
                 responseContent.FinalMesage(400, "Error", response);
                 return;
             }
-            try{
-                for(Product product : products) {
-                    if(product.getName() == null || product.getName().equals("")){
-                        responseContent.FinalMesage(400, "Name is required", response);
-                    } else if(product.getCategory() == null || product.getCategory().equals("")){
-                        responseContent.FinalMesage(400, "Category is required", response);
-                    } else if(product.getPrice() == 0){
-                        responseContent.FinalMesage(400, "Price is required", response);
-                    } else {
-                        productDao.addProduct(product);
-                        responseContent.FinalMesage(200, "Product added", response);
-                    }
+            for(Product product : products) {
+                if(product.getName() == null || product.getName().equals("")){
+                    responseContent.FinalMesage(400, "Name is required", response);
+                } else if(product.getCategory() == null || product.getCategory().equals("")){
+                    responseContent.FinalMesage(400, "Category is required", response);
+                } else if(product.getPrice() == 0){
+                    responseContent.FinalMesage(400, "Price is required", response);
+                } else {
+                    productDao.addProduct(product);
+                    responseContent.FinalMesage(200, "Product added", response);
                 }
-            } catch (Exception e) {
-                responseContent.FinalMesage(400, "Error", response);
             }
         } catch (IOException e) {
             try {
@@ -226,7 +222,7 @@ public class ProductServiceImpl implements ProductService {
                         productDao.deleteProduct(product.getId());
                         responseContent.FinalMesage(200, "Product deleted", response);
                     }
-                } catch (Exception e) {
+                } catch (IOException e) {
                     responseContent.FinalMesage(400, "Error", response);
                 }
             }

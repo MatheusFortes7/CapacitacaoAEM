@@ -33,12 +33,10 @@ public class ProductDaoImpl implements ProductDao{
                         products.add(product);
                     }
                 }
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex.getMessage() + " Error getting all products.");
             }
             return products;
         } catch (SQLException ex) {
-            throw new RuntimeException(ex);
+            throw new RuntimeException(ex.getMessage() + " Error getting all the clients.");
         }
     }
 
@@ -59,11 +57,9 @@ public class ProductDaoImpl implements ProductDao{
                         return product;
                     }
                 }
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex.getMessage() + " Error getting the client by this id.");
             }
         } catch (SQLException ex) {
-            throw new RuntimeException(ex);
+            throw new RuntimeException(ex.getMessage() + " Error getting the product by this id.");
         }
         return null;
     }
@@ -86,12 +82,10 @@ public class ProductDaoImpl implements ProductDao{
                         products.add(product);
                     }
                 }
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex.getMessage() + " Error getting the product by this word.");
             }
             return products;
         } catch (SQLException ex) {
-            throw new RuntimeException(ex);
+            throw new RuntimeException(ex.getMessage() + " Error getting the product by this word.") ;
         }
     }
 
@@ -112,12 +106,10 @@ public class ProductDaoImpl implements ProductDao{
                         products.add(product);
                     }
                 }
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex.getMessage() + " Error getting the product by this category.");
             }
             return products;
         } catch (SQLException ex) {
-            throw new RuntimeException(ex);
+            throw new RuntimeException(ex.getMessage() + " Error getting the product by this category.");
         }
     }
 
@@ -137,12 +129,10 @@ public class ProductDaoImpl implements ProductDao{
                         products.add(product);
                     }
                 }
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex.getMessage() + " Error getting the product by this price.");
             }
             return products;
         } catch (SQLException ex) {
-            throw new RuntimeException(ex);
+            throw new RuntimeException(ex.getMessage() + " Error getting the product by this price.");
         }
     }
 
@@ -156,11 +146,9 @@ public class ProductDaoImpl implements ProductDao{
                 statement.setString(2, product.getCategory());
                 statement.setFloat(3, product.getPrice());
                 statement.executeUpdate();
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex.getMessage() + " Error adding a new product.");
             }
         } catch (SQLException ex) {
-            throw new RuntimeException(ex);
+            throw new RuntimeException(ex.getMessage() + " Error adding a new product.");
         }
     }
 
@@ -175,11 +163,9 @@ public class ProductDaoImpl implements ProductDao{
                 statement.setFloat(3, product.getPrice());
                 statement.setInt(4, product.getId());
                 statement.executeUpdate();
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex.getMessage() + " Error updating the product.");
             }
         } catch (SQLException ex) {
-            throw new RuntimeException(ex);
+            throw new RuntimeException(ex.getMessage() + " Error updating the product.");
         }
     }
 
@@ -191,11 +177,9 @@ public class ProductDaoImpl implements ProductDao{
             try(PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setInt(1, id);
                 statement.executeUpdate();
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex.getMessage() + " Error deleting the product.");
             }
         } catch (SQLException ex) {
-            throw new RuntimeException(ex);
+            throw new RuntimeException(ex.getMessage() + " Error deleting the product.");
         }
     }
 }

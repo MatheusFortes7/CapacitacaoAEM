@@ -40,11 +40,12 @@ public class NoteServiceImpl implements NoteService{
             }
         }else{
             try{
-                if(getAllNote().size() > 0){
+                final List<Note> note = getAllNote();
+                if(note.size() == 0){
+                    responseContent.FinalMesage(400, "No notes found", response);
+                }else{
                     responseContent.getRequest(200, response);
                     response.getWriter().write(strToJson(getAllNote()));
-                }else{
-                    responseContent.FinalMesage(400, "No notes found", response);
                 }
             } catch (Exception e){
                 responseContent.FinalMesage(400, "Error", response);

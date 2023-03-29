@@ -32,11 +32,9 @@ public class ClientDaoImpl implements ClientDao{
                         return client;
                     }
                 }
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex.getMessage() + " Error getting the client by this id.");
             }
         } catch (SQLException ex) {
-            throw new RuntimeException(ex);
+            throw new RuntimeException((ex) + " Error getting the client by this id.");
         }
         return null;
     }
@@ -52,12 +50,10 @@ public class ClientDaoImpl implements ClientDao{
                         clients.add(client);
                     }
                 }
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex.getMessage() + " Error getting all clients.");
             }
             return clients;
         } catch (SQLException ex) {
-            throw new RuntimeException(ex);
+            throw new RuntimeException(ex + " Error getting all clients.");
         }
     }
 
@@ -68,11 +64,9 @@ public class ClientDaoImpl implements ClientDao{
             try(PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, client.getName());
                 statement.executeUpdate();
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex.getMessage() + " Error adding a new client.");
             }
         } catch (SQLException ex) {
-            throw new RuntimeException(ex);
+            throw new RuntimeException((ex) + " Error adding this client.");
         }
     }
 
@@ -84,11 +78,9 @@ public class ClientDaoImpl implements ClientDao{
                 statement.setString(1, client.getName());
                 statement.setInt(2, client.getId());
                 statement.executeUpdate();
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex.getMessage() + " Error updating this client.");
             }
         } catch (SQLException ex) {
-            throw new RuntimeException(ex);
+            throw new RuntimeException((ex) + " Error updating this client.");
         }
     }
 
@@ -99,11 +91,9 @@ public class ClientDaoImpl implements ClientDao{
             try(PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setInt(1, id);
                 statement.executeUpdate();
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex.getMessage() + " Error deleting this client.");
             }
         } catch (SQLException ex) {
-            throw new RuntimeException(ex);
+            throw new RuntimeException((ex) + " Error deleting this client.");
         }
     }
 }
